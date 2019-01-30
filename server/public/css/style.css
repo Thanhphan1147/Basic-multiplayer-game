@@ -1,0 +1,91 @@
+body {
+	font : 15px/1.5 Arial, Helvetica,sans-serif;
+	padding :0;
+	margin:0;
+	background-color: #F2F3F3
+
+}
+
+/* Global stuff **/
+.container{
+	width:80%;
+	margin:auto;
+	overflow:hidden;
+}
+
+ul{
+	margin:0;
+	padding:0;
+}
+
+/*Header**/
+header{
+	background:#2b363c;
+	color:#ffffff;
+	padding-top:30px;
+	min-height:70px;
+	border-bottom:#e5d748 3px solid; 
+}
+
+header a{
+	color:#ffffff;
+	text-decoration:none;
+	text-transform:uppercase;
+	font-style: thick;
+	font-size:16px;
+}
+
+header li {
+	float:left;
+	display:inline;
+	padding: 0 30px 0 30px;
+	
+}
+
+header #gamename{
+	float:left;
+
+}
+
+header #gamename h1{
+	margin:0;
+
+}
+header nav{
+	float:right;
+	margin-top:15px;
+}
+
+header .highlight, header .current a{
+	color:#b60707;
+	font-weight:bold;
+}
+
+header a:hover{
+	color:#cccccc;
+	font-weight:bold;
+}
+
+
+/* Body**/
+
+body #gamesettings{
+	margin-top:100px;
+	margin-bottom:100px;
+}
+
+/*Name selection **/
+body #nameselection{
+	background:#2b363c;
+	color:#ffffff;
+}
+body #nameselection h1{
+	text-align:center;
+}
+
+/*Color selection **/
+body #colorselection{
+	text-align:center;
+}
+
+body

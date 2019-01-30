@@ -1,7 +1,19 @@
+<!DOCTYPE html>
 <html>
 
+
 <head>
-    <style>
+
+	<link rel="stylesheet" type="text/css" href="./css/style.css">
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"">
+	<meta name="gamename" content ="GameAttempt"> 
+
+
+	<title>TragicGameAttempt | Welcome</title>
+
+    <!-- <style>
         #preload {
                 position: absolute;
                 top: 400px;
@@ -29,30 +41,74 @@
                 left: 200px;
                 z-index: -1;
             }
-        </style>
+        </style> -->
+
+
+
+
+<header>
+		<div class="container">
+			<div id="gamename">
+				<h1><span class="highlight">T</span>ragic<span class="highlight">G</span>ame<span class="highlight">A</span>ttempt</h1>
+				<!--<img src="./img/logo1.png">-->
+			</div>
+			<nav>
+				<ul>
+					<li class="current"><a href="index.html">Home</a></li>
+					<li><a href="index.html">Rules</a></li>
+				</ul>
+			</nav>
+
+
+</header>
 
 <body>
-    <div id="preload">
-        <form action="" method="">
-            Name: <input id="pl" type="text" name="name">
-        </form>
-        <select id="col">
-            <option value="red">Red</option>
-            <option value="blue">Blue</option>
-            <option value="yellow">Yellow</option>
-            <option value="violet">Violet</option>
-            <option value="green">Green</option>
-            <option value="teal">Teal</option>
-            <option value="gray">Gray</option>
-            <option value="black">Black</option>
-        </select>
-        <button onclick="Preload()">Start</button>
-    </div>
-    <div id="position"></div>
-    <div id="hub"></div>
-    <canvas id="canvas"></canvas>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
-    <script src="script.js"></script>
+
+		
+		<section id="gamesettings">
+		 	<div id="preload">
+
+		 				<div id="nameselection">
+					        <form action="" method="">
+					            <h1>Player name: <input id="pl" type="text" name="name" placeholder="Enter Name ..."></h1>
+					        </form>
+				        </div>
+
+				        <div id="colorselection">
+					        <h1>Player color :</h1>
+					        <select id="col">
+					            <option value="red">Red</option>
+					            <option value="blue">Blue</option>
+					            <option value="yellow">Yellow</option>
+					            <option value="violet">Violet</option>
+					            <option value="green">Green</option>
+					            <option value="teal">Teal</option>
+					            <option value="gray">Gray</option>
+					            <option value="black">Black</option>
+					        </select>
+				    	</div>
+				        
+				    	<div id="startbutton">
+				        	<button onclick="Preload()">Start</button>
+				        </div>
+			</div>
+
+			<div id="position"></div>
+			<div id="hub"></div>
+			<canvas id="canvas"></canvas>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+			<script src="script.js"></script>	    	
+				   
+		</section>
+
+
+		
+
+
+	
+
+
+    
 </body>
 </head>
 
