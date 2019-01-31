@@ -7,8 +7,8 @@ var key = {
 }
 
 var mouse = {
-    mouseX: 0,
-    mouseY: 0
+    x: 0,
+    y: 0
 }
 
 function Preload() {
@@ -33,6 +33,7 @@ function init() {
 }
 
 function Game() {
+    this.canvas2 = document.getElementById('canvas2');
     this.canvas = document.getElementById('canvas');
     this.position = document.getElementById('position');
     this.hub = document.getElementById('hub');
@@ -47,8 +48,16 @@ function Game() {
     this.init = function () {
         if (this.canvas.getContext) {
             Player.prototype.context = this.canvas.getContext('2d');
+            Background.prototype.context = this.canvas2.getContext('2d');
+
             this.canvas.width = window.innerWidth;
             this.canvas.height = window.innerHeight;
+
+            this.canvas2.width = window.innerWidth;
+            this.canvas2.height = window.innerHeight;
+
+            this.background = new Background();
+            this.background.init(0, 0);
 
             document.addEventListener('keydown', function (e) {
                 switch (e.keyCode) {
@@ -85,7 +94,9 @@ function Game() {
             });
 
             document.addEventListener('mousemove', function (e) {
-
+                mouse.x = e.pageX;
+                mouse.y = e.pageY;
+                game.position.innerHTML = "mousex: " + mouse.x + " mousey: " + mouse.y;
             });
 
             return true;
@@ -94,6 +105,7 @@ function Game() {
         }
     }
     this.start = function () {
+        this.background.draw();
         this.player.draw();        //draw player
         for (var i = 0; i < size; i++) {                               //draw other players
             if (this.otherPlayers[i].connected === true) {
@@ -172,6 +184,21 @@ socket.on('update', (val) => {
 
 })
 
+var ImageAsset = new function () {
+    this.background = new Image();
+    this.background.src = "/img/top-down-ice.jpg";
+}
+
+function DrawableObj() {
+    this.x = 0;
+    this.y = 0;
+
+    this.init = function (x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
 function Player() {
     this.id = 'N/A';
     this.x = 0;
@@ -195,10 +222,20 @@ function Player() {
         this.context.fill();
         this.context.stroke();
         this.context.font = "15px Comic Sans MS";
-        this.context.fillStyle = 'black'
-        this.context.fillText(this.name, this.x - this.r, this.y - this.r);
+        this.context.fillStyle = 'black';
+        this.context.fillText(this.name, this.x - this.context.measureText(this.name).width / 2, this.y - this.r);
     }
 }
+
+function Background() {
+    this.draw = function () {
+        console.log('tried to draw');
+        this.context.scale(window.innerWidth/ImageAsset.background.width,window.innerHeight/ImageAsset.background.height);
+        this.context.drawImage(ImageAsset.background, this.x, this.y);
+    }
+}
+
+Background.prototype = new DrawableObj();
 
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||

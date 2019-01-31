@@ -89,7 +89,7 @@ io.on('connection', (socket) => {
             if (pool[i].id === socket.id) {
                 pool[i].x = pool[i].x + pos.dx;
                 pool[i].y = pool[i].y + pos.dy;
-                if(ColisionDetector(i) || pool[i].x + pool[i].r >= 1853 || pool[i].y + pool[i].r >= 951 || pool[i].x - pool[i].r <= 0 || pool[i].y + pool[i].r <= 0){
+                if (ColisionDetector(i) || pool[i].x + pool[i].r >= 1853 || pool[i].y + pool[i].r >= 951 || pool[i].x - pool[i].r <= 0 || pool[i].y + pool[i].r <= 0) {
                     pool[i].x = pool[i].x - pos.dx;
                     pool[i].y = pool[i].y - pos.dy;
                 }
