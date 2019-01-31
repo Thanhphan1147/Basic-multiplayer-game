@@ -1,0 +1,25 @@
+{
+  "name": "basic-multiplayer-game",
+  "version": "1.0.0",
+  "description": "Basic IO game stuffs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Thanhphan1147/Basic-multiplayer-game.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Thanhphan1147/Basic-multiplayer-game/issues"
+  },
+  "homepage": "https://github.com/Thanhphan1147/Basic-multiplayer-game#readme",
+  "dependencies": {
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "nodemon": "^1.18.9",
+    "socket.io": "^2.2.0"
+  }
+}

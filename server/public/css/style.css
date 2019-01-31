@@ -1,3 +1,17 @@
+/* Color pallet:
+
+
+Light Grey: #F2F3F3 ; Site Background
+Dark Grey : #2b363c ; 
+Red : #b60707 ;
+Darker red: #7b0404;
+
+
+ */
+
+
+
+
 body {
 	font : 15px/1.5 Arial, Helvetica,sans-serif;
 	padding :0;
@@ -9,7 +23,7 @@ body {
 /* Global stuff **/
 .container{
 	width:80%;
-	margin:auto;
+	margin-left:15px;
 	overflow:hidden;
 }
 
@@ -24,7 +38,7 @@ header{
 	color:#ffffff;
 	padding-top:30px;
 	min-height:70px;
-	border-bottom:#e5d748 3px solid; 
+	border-bottom:#b60707 3px solid; 
 }
 
 header a{
@@ -94,7 +108,33 @@ header a:hover{
 /*Color selection **/
 #colorselection{
 	text-align:center;
+	color:#2b363c;
 }
+
+
+#col{
+	text-align: center;
+	padding:5px;
+	font-size: 20px;
+	border: none;
+	background: #2b363c;
+	color:#ffffff;
+	box-shadow: 0 5px 10px #2b363c;
+}
+
+#col select{
+	text-align: center;
+	padding:5px;
+	font-size: 20px;
+	border: none;
+	background: #2b363c;
+	color:#ffffff;
+	
+		
+}
+
+
+
 
 /*Play button**/
 #playbutton{
@@ -111,12 +151,12 @@ header a:hover{
 	color:#ffffff;
 	padding-left: 20px;
 	padding-right: 20px;
-	font-size:30px;
+	font-size:30px;-
+	box-shadow: 0 5px 10px #2b363c;
 }
 
 .playbutton:hover{
 	background:#7b0404;
 	font-size:bold;
-
 }
 
