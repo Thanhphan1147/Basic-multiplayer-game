@@ -105,7 +105,7 @@ function animate() {
             game.otherPlayers[i].draw();
         }
     }
-    if (key.dx != 0 || key.dy != 0 && game.player.x + key.dx < window.innerWidth && game.player.y + key.dy < window.innerHeight) {
+    if (key.dx != 0 || key.dy != 0 &&) {
         socket.emit('input', JSON.stringify(key));
     }
     requestAnimFrame(animate);
