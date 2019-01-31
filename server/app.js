@@ -21,7 +21,7 @@ function Player() {
     this.id = 'N/A';
     this.x = 0;
     this.y = 0;
-    this.r = '20';
+    this.r = 20;
     this.color = 'undefined';
     this.name = 'not connected';
 
@@ -33,7 +33,7 @@ function Player() {
 }
 
 var index = 0;
-var size = 4;
+var size = 10;
 var pool = [size];
 function initPlayers() {
     for (var i = 0; i < size; i++) {
@@ -42,6 +42,24 @@ function initPlayers() {
     }
 }
 initPlayers();
+
+function Detector(object1, object2) {
+    if (object1.x + object1.r >= object2.x - object2.r && object2.x + object2.r >= object1.x - object1.r && object1.y + object1.r >= object2.y - object2.r && object2.y + object2.r >= object1.y - object1.r) {
+        //console.log('colision');
+        return true;
+    }
+    return false;
+}
+
+function ColisionDetector(key) {
+    for (var i = 0; i < index; i++) {
+        if (key != i) {
+            if (Detector(pool[key], pool[i]))
+                return true;
+        }
+    }
+    return false;
+}
 
 
 app.use(express.static('public'));
@@ -57,6 +75,7 @@ io.on('connection', (socket) => {
         pool[index].id = socket.id;
         pool[index].name = player.name;
         pool[index].init(randomX(), randomY(), player.color);
+        console.log('added');
         console.log(JSON.stringify(pool[index]));
         socket.emit('player_data', JSON.stringify(pool[index]));
         socket.emit('gameState', JSON.stringify(pool));
@@ -66,15 +85,25 @@ io.on('connection', (socket) => {
 
     socket.on('input', (key) => {
         var pos = JSON.parse(key)
-        for (var i = 0; i < size; i++) {
+        for (var i = 0; i < index; i++) {
             if (pool[i].id === socket.id) {
                 pool[i].x = pool[i].x + pos.dx;
                 pool[i].y = pool[i].y + pos.dy;
-                io.emit('update', JSON.stringify(pool[i]))
+                if(ColisionDetector(i) || pool[i].x + pool[i].r >= 1853 || pool[i].y + pool[i].r >= 951 || pool[i].x - pool[i].r <= 0 || pool[i].y + pool[i].r <= 0){
+                    pool[i].x = pool[i].x - pos.dx;
+                    pool[i].y = pool[i].y - pos.dy;
+                }
+                io.emit('update', JSON.stringify(pool[i]));
             }
         }
     })
     socket.on('disconnect', () => {
+        for (var i = 0; i < index; i++) {
+            if (pool[i].id === socket.id) {
+                pool.i = new Player();
+                pool.push(pool.splice(i, 1));
+            }
+        }
         index--;
         console.log('user disconnected')
     })
