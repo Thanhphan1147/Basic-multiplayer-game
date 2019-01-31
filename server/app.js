@@ -43,6 +43,26 @@ function initPlayers() {
 }
 initPlayers();
 
+function Detector(object1, object2) {
+    if (object1.x + object1.r >= object2.x - object2.r && object2.x + object2.r >= object1.x - object1.r && object1.y + object1.r >= object2.y - object2.r && object2.y + object2.r >= object1.y - object1.r) {
+        console.log('colision');
+        return true;
+    }
+    return false;
+}
+
+function ColisionDetector(key) {
+    console.log('colision detection');
+    for (var i = 0; i < index; i++) {
+        if (key != i) {
+            if (!Detector(pool[key], pool[i])) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 
 app.use(express.static('public'));
 app.get('/', (req, res) => {
@@ -67,11 +87,13 @@ io.on('connection', (socket) => {
 
     socket.on('input', (key) => {
         var pos = JSON.parse(key)
-        for (var i = 0; i < size; i++) {
+        for (var i = 0; i < index; i++) {
             if (pool[i].id === socket.id) {
-                pool[i].x = pool[i].x + pos.dx;
-                pool[i].y = pool[i].y + pos.dy;
-                io.emit('update', JSON.stringify(pool[i]))
+                if (!ColisionDetector(i)) {
+                    pool[i].x = pool[i].x + pos.dx;
+                    pool[i].y = pool[i].y + pos.dy;
+                    io.emit('update', JSON.stringify(pool[i]))
+                }
             }
         }
     })
