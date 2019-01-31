@@ -171,6 +171,7 @@ function Player() {
     this.color = 'undefined';
     this.name = 'not connected';
     this.connected = false;
+    this.colision = false;
 
     this.init = function (x, y, color) {
         this.x = x;
