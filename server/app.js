@@ -54,7 +54,7 @@ function Detector(object1, object2) {
 function ColisionDetector(key) {
     for (var i = 0; i < index; i++) {
         if (key != i) {
-            if (!Detector(pool[key], pool[i])) {
+            if (Detector(pool[key], pool[i])) {
                 return true;
             }
         }
