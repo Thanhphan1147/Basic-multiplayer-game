@@ -21,7 +21,7 @@ function Player() {
     this.id = 'N/A';
     this.x = 0;
     this.y = 0;
-    this.r = '20';
+    this.r = 20;
     this.color = 'undefined';
     this.name = 'not connected';
 
@@ -33,7 +33,7 @@ function Player() {
 }
 
 var index = 0;
-var size = 4;
+var size = 10;
 var pool = [size];
 function initPlayers() {
     for (var i = 0; i < size; i++) {
@@ -45,7 +45,7 @@ initPlayers();
 
 function Detector(object1, object2) {
     if (object1.x + object1.r >= object2.x - object2.r && object2.x + object2.r >= object1.x - object1.r && object1.y + object1.r >= object2.y - object2.r && object2.y + object2.r >= object1.y - object1.r) {
-        console.log('colision');
+        //console.log('colision');
         return true;
     }
     return false;
@@ -54,9 +54,8 @@ function Detector(object1, object2) {
 function ColisionDetector(key) {
     for (var i = 0; i < index; i++) {
         if (key != i) {
-            if (pool[key].x + pool[key].r >= pool[i].x - pool[i].r && pool[i].x + pool[i].r >= pool[key].x - pool[key].r && pool[key].y + pool[key].r >= pool[i].y - pool[i].r && pool[i].y + pool[i].r >= pool[key].y - pool[key].r) {
+            if (Detector(pool[key], pool[i]))
                 return true;
-            }
         }
     }
     return false;
@@ -88,11 +87,13 @@ io.on('connection', (socket) => {
         var pos = JSON.parse(key)
         for (var i = 0; i < index; i++) {
             if (pool[i].id === socket.id) {
-                if (!ColisionDetector(i)) {
-                    pool[i].x = pool[i].x + pos.dx;
-                    pool[i].y = pool[i].y + pos.dy;
-                    io.emit('update', JSON.stringify(pool[i]))
+                pool[i].x = pool[i].x + pos.dx;
+                pool[i].y = pool[i].y + pos.dy;
+                if(ColisionDetector(i) || pool[i].x + pool[i].r >= 1853 || pool[i].y + pool[i].r >= 951 || pool[i].x - pool[i].r <= 0 || pool[i].y + pool[i].r <= 0){
+                    pool[i].x = pool[i].x - pos.dx;
+                    pool[i].y = pool[i].y - pos.dy;
                 }
+                io.emit('update', JSON.stringify(pool[i]));
             }
         }
     })

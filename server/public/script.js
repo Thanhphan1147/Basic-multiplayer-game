@@ -6,6 +6,11 @@ var key = {
     dy: 0
 }
 
+var mouse = {
+    mouseX: 0,
+    mouseY: 0
+}
+
 function Preload() {
     var preloaddiv = document.getElementById('preload');
     var pl = document.getElementById('pl');
@@ -77,6 +82,10 @@ function Game() {
                         key.dx = 0
                         break;
                 }
+            });
+
+            document.addEventListener('mousemove', function (e) {
+
             });
 
             return true;
