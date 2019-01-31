@@ -64,16 +64,14 @@ io.on('connection', (socket) => {
         io.emit('addplayer', JSON.stringify(pool[index]));
         index++;
     })
-    
+
     socket.on('input', (key) => {
         var pos = JSON.parse(key)
         for (var i = 0; i < size; i++) {
             if (pool[i].id === socket.id) {
-                if(pool[i].x + pos.dx < window.innerWidth || pool[i].y + pos.dy < window.innerHeight){
-                    pool[i].x = pool[i].x + pos.dx;
-                    pool[i].y = pool[i].y + pos.dy;
-                    io.emit('update', JSON.stringify(pool[i]))
-                }
+                pool[i].x = pool[i].x + pos.dx;
+                pool[i].y = pool[i].y + pos.dy;
+                io.emit('update', JSON.stringify(pool[i]))
             }
         }
     })
