@@ -57,24 +57,33 @@ io.on('connection', (socket) => {
         pool[index].id = socket.id;
         pool[index].name = player.name;
         pool[index].init(randomX(), randomY(), player.color);
+        console.log('added');
         console.log(JSON.stringify(pool[index]));
         socket.emit('player_data', JSON.stringify(pool[index]));
         socket.emit('gameState', JSON.stringify(pool));
         io.emit('addplayer', JSON.stringify(pool[index]));
         index++;
     })
-
+    
     socket.on('input', (key) => {
         var pos = JSON.parse(key)
         for (var i = 0; i < size; i++) {
             if (pool[i].id === socket.id) {
-                pool[i].x = pool[i].x + pos.dx;
-                pool[i].y = pool[i].y + pos.dy;
-                io.emit('update', JSON.stringify(pool[i]))
+                if(pool[i].x + pos.dx < window.innerWidth || pool[i].y + pos.dy < window.innerHeight){
+                    pool[i].x = pool[i].x + pos.dx;
+                    pool[i].y = pool[i].y + pos.dy;
+                    io.emit('update', JSON.stringify(pool[i]))
+                }
             }
         }
     })
     socket.on('disconnect', () => {
+        for (var i = 0; i < index; i++) {
+            if (pool[i].id === socket.id) {
+                pool.i = new Player();
+                pool.push(pool.splice(i, 1));
+            }
+        }
         index--;
         console.log('user disconnected')
     })
