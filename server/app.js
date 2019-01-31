@@ -54,7 +54,7 @@ function Detector(object1, object2) {
 function ColisionDetector(key) {
     for (var i = 0; i < index; i++) {
         if (key != i) {
-            if (Detector(pool[key], pool[i])) {
+            if (pool[key].x + pool[key].r >= pool[i].x - pool[i].r && pool[i].x + pool[i].r >= pool[key].x - pool[key].r && pool[key].y + pool[key].r >= pool[i].y - pool[i].r && pool[i].y + pool[i].r >= pool[key].y - pool[key].r) {
                 return true;
             }
         }
