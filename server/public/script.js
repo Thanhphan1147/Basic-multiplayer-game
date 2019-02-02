@@ -1,4 +1,4 @@
-socket = io.connect('http://192.168.1.18:8080');
+socket = io.connect('http://localhost:8080');
 var size = 3;
 var index = 0;
 var key = {
@@ -229,7 +229,6 @@ function Player() {
 
 function Background() {
     this.draw = function () {
-        console.log('tried to draw');
         this.context.scale(window.innerWidth/ImageAsset.background.width,window.innerHeight/ImageAsset.background.height);
         this.context.drawImage(ImageAsset.background, this.x, this.y);
     }
