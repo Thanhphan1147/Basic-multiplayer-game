@@ -7,7 +7,6 @@ function randomX() {
     var x = Math.floor((Math.random() * (1600 - 250) + 1));
     //console.log(x);
     return x;
-
 }
 
 function randomY() {
@@ -75,7 +74,7 @@ io.on('connection', (socket) => {
         pool[index].id = socket.id;
         pool[index].name = player.name;
         pool[index].init(randomX(), randomY(), player.color);
-        console.log('added');
+        //console.log('added');
         console.log(JSON.stringify(pool[index]));
         socket.emit('player_data', JSON.stringify(pool[index]));
         socket.emit('gameState', JSON.stringify(pool));
