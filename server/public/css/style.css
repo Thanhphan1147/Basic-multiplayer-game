@@ -1,3 +1,7 @@
+textarea:focus, input:focus{
+    outline: none;
+}
+
 body {
 	font : 15px/1.5 Arial, Helvetica,sans-serif;
 	padding :0;
@@ -50,7 +54,7 @@ header{
 	color:#ffffff;
 	padding-top:30px;
 	min-height:70px;
-	border-bottom:#e5d748 3px solid; 
+	border-bottom:#e5d748 3px solid;
 }
 
 header a{
@@ -64,7 +68,7 @@ header a{
 header li {
 	display:inline;
 	padding: 0 30px 0 30px;
-	
+
 }
 
 header #gamename{
@@ -111,9 +115,12 @@ header a:hover{
 }
 
 #nameselection input[type="text"]{
+	font-family: "Comic Sans MS", cursive, sans-serif;
+	font-size: large;
 	height:25px;
-	width:100px;
+	width:200px;
 	padding:5px;
+	border-radius: 10px;
 }
 
 /*Color selection **/
@@ -129,6 +136,7 @@ header a:hover{
 }
 
 .playbutton{
+	border-radius: 15px;
 	height:80px;
 	width:160px;
 	background:#b60707;
@@ -137,11 +145,10 @@ header a:hover{
 	padding-left: 20px;
 	padding-right: 20px;
 	font-size:30px;
+	font-family: "Comic Sans MS", cursive, sans-serif;
 }
 
 .playbutton:hover{
 	background:#7b0404;
 	font-size:bold;
-
 }
-
