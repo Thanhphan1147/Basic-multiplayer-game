@@ -3,7 +3,9 @@ var size = 3;
 var index = 0;
 var key = {
     dx: 0,
-    dy: 0
+    dy: 0,
+    angle: 0,
+    rotate: false
 }
 
 var mouse = {
@@ -94,9 +96,10 @@ function Game() {
             });
 
             document.addEventListener('mousemove', function (e) {
-                mouse.x = e.pageX;
-                mouse.y = e.pageY;
-                game.position.innerHTML = "mousex: " + mouse.x + " mousey: " + mouse.y;
+                var deg = Math.atan2( (e.pageX - game.player.x), - (e.pageY - 100 - game.player.y) );
+                //game.position.innerHTML = "rotation: " + deg;
+                key.angle = deg;
+                key.rotate = true;
             });
 
             return true;
@@ -126,9 +129,11 @@ function animate() {
             game.otherPlayers[i].draw();
         }
     }
-    if (key.dx != 0 || key.dy != 0) {
+    if (key.dx != 0 || key.dy != 0 || key.rotate) {
         socket.emit('input', JSON.stringify(key));
+        key.rotate = false;
     }
+    game.position.innerHTML = "rotation: " + game.player.angle;
     requestAnimFrame(animate);
 }
 
@@ -140,7 +145,7 @@ socket.on('gameState', (pool) => {
             game.otherPlayers[index].id = state[i].id;
             game.otherPlayers[index].connected = true;
             game.otherPlayers[index].name = state[i].name;
-            game.otherPlayers[index].init(state[i].x, state[i].y, state[i].color);
+            game.otherPlayers[index].init(state[i].x, state[i].y, state[i].color, state[i].angle);
             index++;
         }
     }
@@ -152,7 +157,7 @@ socket.on('player_data', (val) => {
     var pos = JSON.parse(val);
     console.log(pos);
     game.player.name = pos.name;
-    game.player.init(pos.x, pos.y, pos.color);
+    game.player.init(pos.x, pos.y, pos.color, pos.angle);
     game.player.id = pos.id;
 })
 
@@ -163,7 +168,7 @@ socket.on('addplayer', (val) => {
         game.otherPlayers[index].id = player.id;
         game.otherPlayers[index].connected = true;
         game.otherPlayers[index].name = player.name;
-        game.otherPlayers[index].init(player.x, player.y, player.color);
+        game.otherPlayers[index].init(player.x, player.y, player.color, player.angle);
         index++;
     }
 })
@@ -173,11 +178,13 @@ socket.on('update', (val) => {
     if (pos.id === game.player.id) {
         game.player.x = pos.x;
         game.player.y = pos.y;
+        game.player.angle = pos.angle;
     } else {
         for (var i = 0; i < index; i++) {
             if (game.otherPlayers[i].id === pos.id) {
                 game.otherPlayers[i].x = pos.x;
                 game.otherPlayers[i].y = pos.y;
+                game.otherPlayers.angle = pos.angle;
             }
         }
     }
@@ -204,23 +211,35 @@ function Player() {
     this.x = 0;
     this.y = 0;
     this.r = '20';
+    this.angle = 0;
     this.color = 'undefined';
     this.name = 'not connected';
     this.connected = false;
     this.colision = false;
 
-    this.init = function (x, y, color) {
+    this.init = function (x, y, color, angle) {
         this.x = x;
         this.y = y;
         this.color = color;
+        this.angle = angle;
     }
 
     this.draw = function () {
+        //  rotate
+        this.context.translate(this.x,this.y);
+        this.context.rotate(+this.angle - Math.PI/2);
+        //draw player
         this.context.beginPath();
-        this.context.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+        this.context.arc(0 + this.r, 0 - this.r/2, this.r/2, 0, 2 * Math.PI);
+        this.context.arc(0 + this.r, 0 + this.r/2, this.r/2, 0, 2 * Math.PI);
+        this.context.arc(0, 0, this.r, 0, 2 * Math.PI);
         this.context.fillStyle = this.color;
         this.context.fill();
         this.context.stroke();
+        //  rotate
+        this.context.rotate(-this.angle + Math.PI/2);
+        this.context.translate(-this.x,-this.y);
+        // player name
         this.context.font = "15px Comic Sans MS";
         this.context.fillStyle = 'black';
         this.context.fillText(this.name, this.x - this.context.measureText(this.name).width / 2, this.y - this.r);
