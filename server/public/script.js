@@ -102,6 +102,11 @@ function Game() {
                 key.rotate = true;
             });
 
+            document.addEventListener("click", function(){
+              //console.log(game.player);
+              socket.emit('Mouseclick', game.player.id);
+            });
+
             return true;
         } else {
             return false;
@@ -133,7 +138,6 @@ function animate() {
         socket.emit('input', JSON.stringify(key));
         key.rotate = false;
     }
-    game.position.innerHTML = "rotation: " + game.player.angle;
     requestAnimFrame(animate);
 }
 
@@ -184,16 +188,30 @@ socket.on('update', (val) => {
             if (game.otherPlayers[i].id === pos.id) {
                 game.otherPlayers[i].x = pos.x;
                 game.otherPlayers[i].y = pos.y;
-                game.otherPlayers.angle = pos.angle;
+                game.otherPlayers[i].angle = pos.angle;
             }
         }
     }
 
 })
 
+socket.on('Fire!', (id) => {
+  if (pos.id === game.player.id) {
+  } else {
+      for (var i = 0; i < index; i++) {
+          if (game.otherPlayers[i].id === pos.id) {
+          }
+      }
+  }
+})
+
 var ImageAsset = new function () {
     this.background = new Image();
-    this.background.src = "/img/top-down-ice.jpg";
+    this.background.src = "/img/top-down-dungeon.jpg";
+    this.bow = new Image();
+    this.bow.src = "/img/bow.png";
+    this.arrow = new Image();
+    this.arrow.src = " ";
 }
 
 function DrawableObj() {
@@ -210,7 +228,7 @@ function Player() {
     this.id = 'N/A';
     this.x = 0;
     this.y = 0;
-    this.r = '20';
+    this.r = 24;
     this.angle = 0;
     this.color = 'undefined';
     this.name = 'not connected';
@@ -230,19 +248,30 @@ function Player() {
         this.context.rotate(+this.angle - Math.PI/2);
         //draw player
         this.context.beginPath();
-        this.context.arc(0 + this.r, 0 - this.r/2, this.r/2, 0, 2 * Math.PI);
-        this.context.arc(0 + this.r, 0 + this.r/2, this.r/2, 0, 2 * Math.PI);
+        this.context.arc(0 + this.r/2 + this.r/6, 0 + this.r/2 + this.r/12, this.r/3 + this.r/12, 0, 2 * Math.PI);
+        this.context.fillStyle = this.color;
+        this.context.fill();
+        this.context.stroke();
+
+        this.context.beginPath();
+        this.context.arc(0 + this.r/2 + this.r/6, 0 - this.r/2 - this.r/12, this.r/3 + this.r/12, 0, 2 * Math.PI);
+        this.context.fillStyle = this.color;
+        this.context.fill();
+        this.context.stroke();
+
+        this.context.beginPath();
         this.context.arc(0, 0, this.r, 0, 2 * Math.PI);
         this.context.fillStyle = this.color;
         this.context.fill();
         this.context.stroke();
+        this.context.drawImage(ImageAsset.bow, 0 - ImageAsset.bow.width * 0.3/2, 0 - ImageAsset.bow.height * 0.3/2, ImageAsset.bow.width * 0.3, ImageAsset.bow.height * 0.3);
         //  rotate
         this.context.rotate(-this.angle + Math.PI/2);
         this.context.translate(-this.x,-this.y);
         // player name
         this.context.font = "15px Comic Sans MS";
         this.context.fillStyle = 'black';
-        this.context.fillText(this.name, this.x - this.context.measureText(this.name).width / 2, this.y - this.r);
+        this.context.fillText(this.name, this.x - this.context.measureText(this.name).width / 2, this.y - this.r - this.r/6);
     }
 }
 
@@ -253,6 +282,82 @@ function Background() {
     }
 }
 
+function Arrow() {
+    this.isColliding = false;
+    this.speed = 40;
+    this.alive = false;
+    this.angle = 0;
+
+    this.draw = function () {
+        this.context.clearRect(this.x, this.y, ImageAsset.arrow.width, ImageAsset.arrow.height);
+        this.x -= this.speed;
+        if (this.x <= 0) {
+            return true;
+        }
+        this.context.drawImage(ImageAsset.arrow, this.x, this.y);
+    };
+
+    this.reset = function () {
+        this.x = 0 - 160;
+        this.y = 0 + 120;
+        this.alive = false;
+        this.isColliding = false;
+    };
+
+    this.spawn = function (x, y) {
+        this.x = x;
+        this.y = y;
+        this.alive = true;
+    };
+}
+
+function Pool(maxCapacity) {
+    var size = maxCapacity;
+    var pool = [];
+    this.init = function (object) {
+      for (var i = 0; i < size; i++) {
+          var arrow = new Arrow();
+          arrow.init(0,0,ImageAsset.arrow.width,ImageAsset.arrow.height);
+          pool[i] = arrow;
+      }
+    };
+    this.get = function () {
+        if (!pool[size-1].alive) {
+            pool[size-1].spawn();
+            pool.unshift(pool.pop());
+        }
+    };
+    this.getTwo = function () {
+        if (!pool[size-1].alive && !pool[size-2].alive) {
+            pool[size-1].spawn();
+            pool[size-2].spawn2();
+            pool.unshift(pool.pop());
+            pool.unshift(pool.pop());
+        }
+    }
+    this.animate = function () {
+        for (var i = 0; i < size; i++) {
+            if (pool[i].alive) {
+                if (pool[i].draw()) {
+                    pool[i].reset();
+                    pool.push((pool.splice(i,1))[0]);
+                }
+            } else
+                break;
+        }
+    };
+    this.getPool = function () {
+        var arr = [];
+        for (var i = 0; i < size; i++) {
+            if (pool[i].alive) {
+                arr.push(pool[i]);
+            }
+        }
+        return arr;
+    };
+}
+
+Arrow.prototype = new DrawableObj();
 Background.prototype = new DrawableObj();
 
 window.requestAnimFrame = (function () {
