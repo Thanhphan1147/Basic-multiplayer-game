@@ -20,7 +20,7 @@ function Player() {
     this.id = 'N/A';
     this.x = 0;
     this.y = 0;
-    this.r = 20;
+    this.r = 24;
     this.angle = 0;
     this.color = 'undefined';
     this.name = 'not connected';
@@ -97,6 +97,10 @@ io.on('connection', (socket) => {
                 io.emit('update', JSON.stringify(pool[i]));
             }
         }
+    })
+
+    socket.on('Mouseclick', (id) => {
+      io.emit('Fire!',id);
     })
     socket.on('disconnect', () => {
         for (var i = 0; i < index; i++) {
