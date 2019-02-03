@@ -7,3 +7,5 @@ git clone https://github.com/Thanhphan1147/Basic-multiplayer-game.git
 npm install  
 
 node app.js or npm run start to start the server through terminal (windows cmd). 
+  
+Dudes now have giant long bow to shoot people
