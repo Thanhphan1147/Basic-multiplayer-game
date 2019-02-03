@@ -96,7 +96,7 @@ function Game() {
             });
 
             document.addEventListener('mousemove', function (e) {
-                var deg = Math.atan2( (e.pageX - game.player.x), - (e.pageY - 100 - game.player.y) );
+                var deg = Math.atan2( (e.pageX - game.player.x), - (e.pageY - 100 - game.player.y) ) - Math.PI/2;
                 //game.position.innerHTML = "rotation: " + deg;
                 key.angle = deg;
                 key.rotate = true;
@@ -196,10 +196,10 @@ socket.on('update', (val) => {
 })
 
 socket.on('Fire!', (id) => {
-  if (pos.id === game.player.id) {
+  if (id === game.player.id) {
   } else {
       for (var i = 0; i < index; i++) {
-          if (game.otherPlayers[i].id === pos.id) {
+          if (game.otherPlayers[i].id === id) {
           }
       }
   }
@@ -245,7 +245,7 @@ function Player() {
     this.draw = function () {
         //  rotate
         this.context.translate(this.x,this.y);
-        this.context.rotate(+this.angle - Math.PI/2);
+        this.context.rotate(+this.angle);
         //draw player
         this.context.beginPath();
         this.context.arc(0 + this.r/2 + this.r/6, 0 + this.r/2 + this.r/12, this.r/3 + this.r/12, 0, 2 * Math.PI);
@@ -266,7 +266,7 @@ function Player() {
         this.context.stroke();
         this.context.drawImage(ImageAsset.bow, 0 - ImageAsset.bow.width * 0.3/2, 0 - ImageAsset.bow.height * 0.3/2, ImageAsset.bow.width * 0.3, ImageAsset.bow.height * 0.3);
         //  rotate
-        this.context.rotate(-this.angle + Math.PI/2);
+        this.context.rotate(-this.angle);
         this.context.translate(-this.x,-this.y);
         // player name
         this.context.font = "15px Comic Sans MS";
