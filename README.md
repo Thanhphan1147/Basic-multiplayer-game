@@ -2,7 +2,7 @@
 Basic IO game stuffs.
 Only run on localhost or LAN, do not connect to your ip address xD
 
-!/bin/sh  
+#!/bin/sh  
 git clone https://github.com/Thanhphan1147/Basic-multiplayer-game.git  
 npm install  
 
