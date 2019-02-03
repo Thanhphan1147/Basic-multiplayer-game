@@ -11,6 +11,14 @@ body {
 }
 
 /* canvas */
+#canvas3 {
+	position: absolute;
+	top: 100px;
+	left: 0px;
+	z-index: 2;
+	background: transparent;
+}
+
 #canvas2 {
 	position: absolute;
 	top: 100px;
@@ -30,7 +38,7 @@ body {
 	position: absolute;
 	top: 100px;
 	left: 0px;
-	z-index: 2;
+	z-index: 3;
 	height: 100px;
   width: 200px;
 	font-family: "Comic Sans MS", cursive, sans-serif;
@@ -38,12 +46,12 @@ body {
   background: transparent;
   background-color: 'Teal';
 }
-
+/* status */
 #position {
 	position: absolute;
 	top: 100px;
 	left: 200px;
-	z-index: 2;
+	z-index: 3;
 	height: 100px;
   width: 200px;
 	font-family: "Comic Sans MS", cursive, sans-serif;
