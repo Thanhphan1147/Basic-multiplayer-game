@@ -30,19 +30,59 @@ function Player() {
         this.y = y;
         this.color = color;
     }
+    this.reset = function() {
+      this.connected = false;
+      this.id = 'N/A';
+      this.x = 0;
+      this.y = 0;
+      this.r = 24;
+      this.angle = 0;
+      this.color = 'undefined';
+      this.name = 'not connected';
+    }
+}
+
+function Arrow() {
+    this.x = 0;
+    this.y = 0;
+    this.angle = 0;
+    this.alive = false;
+    this.speed = 20;
+
+    this.init = function(x, y, angle) {
+      this.x = x;
+      this.y = y;
+      this.angle = angle;
+    }
+    this.spawn = function() {
+      this.alive = true;
+    }
+
+    this.update = function(){
+      this.x += this.speed;
+    }
 }
 
 var index = 0;
-var size = 10;
+var size = 4;
+var size2 = size * 10;
 var pool = [size];
+var arrowPool = [size2];
 function initPlayers() {
     for (var i = 0; i < size; i++) {
         var player = new Player();
         pool[i] = player;
     }
 }
+function initArrows() {
+    for (var i = 0; i < size2; i++) {
+        var arrow = new Arrow();
+        arrowPool[i] = arrow;
+    }
+}
 initPlayers();
-
+initArrows();
+//console.log(pool[0]);
 function Detector(object1, object2) {
     if (object1.x + object1.r >= object2.x - object2.r && object2.x + object2.r >= object1.x - object1.r && object1.y + object1.r >= object2.y - object2.r && object2.y + object2.r >= object1.y - object1.r) {
         //console.log('colision');
@@ -68,7 +108,8 @@ app.get('/', (req, res) => {
 })
 
 io.on('connection', (socket) => {
-    console.log('new user connected')
+    console.log('new user connected');
+    //console.log(index);
     socket.on('newplayer', (val) => {
         var player = JSON.parse(val);
         pool[index].connected = true;
@@ -99,17 +140,21 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('Mouseclick', (id) => {
-      io.emit('Fire!',id);
+    socket.on('Mouseclick', (data) => {
+      var player = JSON.parse(data);
+      io.emit('Fire!',player.id);
+      if(!arrowPool[size2-1].alive) {
+        //arrowPool[size2-1].spawn(player.x, player.y, player.angle);
+      }
     })
     socket.on('disconnect', () => {
         for (var i = 0; i < index; i++) {
             if (pool[i].id === socket.id) {
-                pool.i = new Player();
+                pool[i].reset();
                 pool.push(pool.splice(i, 1));
+                index--;
             }
         }
-        index--;
         console.log('user disconnected')
     })
 })

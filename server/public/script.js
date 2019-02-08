@@ -110,7 +110,12 @@ function Game() {
 
             document.addEventListener("click", function(){
               //console.log(game.player);
-              socket.emit('Mouseclick', game.player.id);
+              socket.emit('Mouseclick', JSON.stringify({
+                id: game.player.id,
+                x: game.player.x,
+                y: game.player.y,
+                angle: game.player.angle
+              }));
             });
 
             return true;
@@ -360,7 +365,7 @@ function Pool(maxCapacity) {
         for (var i = 0; i < size; i++) {
             if (pool[i].alive) {
                 if (pool[i].draw()) {
-                    console.log('exception reset');
+                    //console.log('exception reset');
                     pool[i].reset();
                     pool.push((pool.splice(i,1))[0]);
                 }
