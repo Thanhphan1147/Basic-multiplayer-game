@@ -222,6 +222,19 @@ socket.on('Fire!', (id) => {
   }
 })
 
+socket.on('gametick', (data) => {
+  game.player.context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  Arrow.prototype.context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  game.player.draw();                                            //draw player
+  game.player.quiver.animate();
+  for (var i = 0; i < size; i++) {                               //draw other players
+      if (game.otherPlayers[i].connected === true) {
+          game.otherPlayers[i].draw();
+          game.otherPlayers[i].quiver.animate();
+      }
+  }
+})
+
 function Player() {
     this.id = 'N/A';
     this.x = 0;

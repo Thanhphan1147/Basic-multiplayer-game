@@ -1,73 +1,32 @@
+//Node modules
 var express = require('express');
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+//Local modules
+const Player = require('./Player.js');
+const Arrow = require('./Arrow.js');
+//Variables and function declaration
+var index = 0;
+var size = 4;
+var size2 = size * 10;
+var arrow_count = 0;
+
+var pool = [size];
+var arrowPool = [size2];
 
 function randomX() {
-    var x = Math.floor((Math.random() * (1600 - 250) + 1));
+    var x = Math.floor((Math.random() * (1600 - 400) + 1));
     //console.log(x);
     return x;
 }
 
 function randomY() {
-    var y = Math.floor((Math.random() * (800 - 200) + 100));
+    var y = Math.floor((Math.random() * (800 - 150) + 100));
     //console.log(y);
     return y;
 }
 
-function Player() {
-    this.connected = false;
-    this.id = 'N/A';
-    this.x = 0;
-    this.y = 0;
-    this.r = 24;
-    this.angle = 0;
-    this.color = 'undefined';
-    this.name = 'not connected';
-
-    this.init = function (x, y, color) {
-        this.x = x;
-        this.y = y;
-        this.color = color;
-    }
-    this.reset = function() {
-      this.connected = false;
-      this.id = 'N/A';
-      this.x = 0;
-      this.y = 0;
-      this.r = 24;
-      this.angle = 0;
-      this.color = 'undefined';
-      this.name = 'not connected';
-    }
-}
-
-function Arrow() {
-    this.x = 0;
-    this.y = 0;
-    this.angle = 0;
-    this.alive = false;
-    this.speed = 20;
-
-    this.init = function(x, y, angle) {
-      this.x = x;
-      this.y = y;
-      this.angle = angle;
-    }
-    this.spawn = function() {
-      this.alive = true;
-    }
-
-    this.update = function(){
-      this.x += this.speed;
-    }
-}
-
-var index = 0;
-var size = 4;
-var size2 = size * 10;
-var pool = [size];
-var arrowPool = [size2];
 function initPlayers() {
     for (var i = 0; i < size; i++) {
         var player = new Player();
@@ -80,8 +39,6 @@ function initArrows() {
         arrowPool[i] = arrow;
     }
 }
-initPlayers();
-initArrows();
 //console.log(pool[0]);
 function Detector(object1, object2) {
     if (object1.x + object1.r >= object2.x - object2.r && object2.x + object2.r >= object1.x - object1.r && object1.y + object1.r >= object2.y - object2.r && object2.y + object2.r >= object1.y - object1.r) {
@@ -101,7 +58,9 @@ function ColisionDetector(key) {
     return false;
 }
 
-
+initPlayers();
+initArrows();
+//-----------------------//
 app.use(express.static('public'));
 app.get('/', (req, res) => {
     res.sendFile(__dirname + "/index.html")
@@ -135,16 +94,17 @@ io.on('connection', (socket) => {
                     pool[i].x = pool[i].x - pos.dx;
                     pool[i].y = pool[i].y - pos.dy;
                 }
-                io.emit('update', JSON.stringify(pool[i]));
             }
         }
     })
 
     socket.on('Mouseclick', (data) => {
       var player = JSON.parse(data);
-      io.emit('Fire!',player.id);
-      if(!arrowPool[size2-1].alive) {
-        //arrowPool[size2-1].spawn(player.x, player.y, player.angle);
+      if (!arrowPool[size-1].alive) {
+          arrowPool[size-1].spawn(x, y, angle);
+          //console.log('fire');
+          arrowPool.unshift(arrowPool.pop());
+          arrow_count ++;
       }
     })
     socket.on('disconnect', () => {
@@ -159,6 +119,30 @@ io.on('connection', (socket) => {
     })
 })
 
+//handle game logic, colision detector,....
+function Tick() {
+  for(var i = 0; i < arrow_count; i++) {
+    if(arrowPool[i].x > 800 ) {
+      arrowPool[i].reset();
+      arrowPool.push((arrowPool.splice(i,1))[0]);
+    } else {
+      arrowPool[i].update();
+    }
+  }
+
+  return {
+    players: pool,
+    arrows: arrowPool
+  }
+}
+
+setInterval( () => {
+  //console.log(Tick());
+  if (index > 0) {
+    io.emit('gametick', JSON.stringify(Tick()));
+  }
+}, 500);
+
 http.listen(8080, function () {
-    console.log('listening on port 8080')
+    console.log('listening on port 8080');
 })
