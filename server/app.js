@@ -3,6 +3,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+
 function randomX() {
     var x = Math.floor((Math.random() * (1600 - 250) + 1));
     //console.log(x);
@@ -15,6 +16,28 @@ function randomY() {
     return y;
 }
 
+function LineCollision(p1, p2, p3, p4) {
+    var d = ((p4.y - p3.y) * (p2.x - p1.x)) - ((p4.x - p3.x) * (p2.y - p1.y));
+    var n1 = ((p4.x - p3.x) * (p1.y - p3.y)) - ((p4.y - p3.y) * (p1.x - p3.x));
+    var n2 = ((p2.x - p1.x) * (p1.y - p3.y)) - ((p2.y - p1.y) * (p1.x - p3.x));
+
+    if ( d == 0.0 )
+    {
+        if ( n1 == 0.0 && n2 == 0.0 )
+        {
+            return false;  //COINCIDENT;
+        }
+
+        return false;   // PARALLEL;
+    }
+
+    var ua = n1 / d;
+    var ub = n2 / d;
+    //console.log(p1.x + ',' + p1.y + ',' + p2.x + ',' + p2.y);
+    return (ua >= 0.0 && ua <= 1.0 && ub >= 0.0 && ub <= 1.0);
+}
+
+
 function Player() {
     this.connected = false;
     this.id = 'N/A';
@@ -24,6 +47,12 @@ function Player() {
     this.angle = 0;
     this.color = 'undefined';
     this.name = 'not connected';
+
+    this.arrow = [15];
+    for (var i = 0; i < 15; i++) {
+        var obj = new Arrow();
+        this.arrow[i] = obj;
+    }
 
     this.init = function (x, y, color) {
         this.x = x;
@@ -54,12 +83,17 @@ function Arrow() {
       this.y = y;
       this.angle = angle;
     }
-    this.spawn = function() {
-      this.alive = true;
-    }
+    this.spawn = function (x, y, angle) {
+        this.alive = true;
+        this.angle = angle;
+        this.originX = x;
+        this.originY = y;
+    };
 
     this.update = function(){
-      this.x += this.speed;
+      if(this.alive) {
+        this.x += this.speed;
+      }
     }
 }
 
@@ -74,14 +108,7 @@ function initPlayers() {
         pool[i] = player;
     }
 }
-function initArrows() {
-    for (var i = 0; i < size2; i++) {
-        var arrow = new Arrow();
-        arrowPool[i] = arrow;
-    }
-}
 initPlayers();
-initArrows();
 //console.log(pool[0]);
 function Detector(object1, object2) {
     if (object1.x + object1.r >= object2.x - object2.r && object2.x + object2.r >= object1.x - object1.r && object1.y + object1.r >= object2.y - object2.r && object2.y + object2.r >= object1.y - object1.r) {
@@ -100,8 +127,6 @@ function ColisionDetector(key) {
     }
     return false;
 }
-
-
 app.use(express.static('public'));
 app.get('/', (req, res) => {
     res.sendFile(__dirname + "/index.html")
@@ -109,14 +134,12 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
     console.log('new user connected');
-    //console.log(index);
     socket.on('newplayer', (val) => {
         var player = JSON.parse(val);
         pool[index].connected = true;
         pool[index].id = socket.id;
         pool[index].name = player.name;
         pool[index].init(randomX(), randomY(), player.color);
-        //console.log('added');
         console.log(JSON.stringify(pool[index]));
         socket.emit('player_data', JSON.stringify(pool[index]));
         socket.emit('gameState', JSON.stringify(pool));
@@ -142,9 +165,18 @@ io.on('connection', (socket) => {
 
     socket.on('Mouseclick', (data) => {
       var player = JSON.parse(data);
-      io.emit('Fire!',player.id);
-      if(!arrowPool[size2-1].alive) {
-        //arrowPool[size2-1].spawn(player.x, player.y, player.angle);
+      for (var i = 0; i < index; i++) {
+          if (pool[i].id === player.id) {
+          }
+        }
+      if (id === game.player.id) {
+          game.player.quiver.get(game.player.x, game.player.y, game.player.angle);
+      } else {
+          for (var i = 0; i < index; i++) {
+              if (game.otherPlayers[i].id === id) {
+                game.otherPlayers[i].quiver.get(game.otherPlayers[i].x, game.otherPlayers[i].y, game.otherPlayers[i].angle);
+              }
+          }
       }
     })
     socket.on('disconnect', () => {
@@ -158,6 +190,20 @@ io.on('connection', (socket) => {
         console.log('user disconnected')
     })
 })
+function Tick() {
+  for (var i = 0; i < index; i++) {
+      if (pool[i].connected === true) {
+        for (var i = 0; i < 15; i++) {
+          pool[i].arrow[i].update();
+        }
+      }
+    }
+    io.emit('gamedata',JSON.stringify(pool);
+}
+
+setInterval(() => {
+  //console.log(JSON.stringify(pool));
+}, 500);
 
 http.listen(8080, function () {
     console.log('listening on port 8080')

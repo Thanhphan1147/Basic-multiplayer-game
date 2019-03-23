@@ -14,6 +14,15 @@ var mouse = {
     y: 0
 }
 
+var ImageAsset = new function () {
+    this.background = new Image();
+    this.background.src = "/img/top-down-dungeon.jpg";
+    this.bow = new Image();
+    this.bow.src = "/img/bow.png";
+    this.arrow = new Image();
+    this.arrow.src = "/img/arrow.png";
+}
+
 function Preload() {
     var preloaddiv = document.getElementById('preload');
     var pl = document.getElementById('pl');
@@ -126,10 +135,8 @@ function Game() {
     this.start = function () {
         this.background.draw();
         this.player.draw();        //draw player
-        for (var i = 0; i < size; i++) {                               //draw other players
-            if (this.otherPlayers[i].connected === true) {
-                this.otherPlayers[i].draw();
-            }
+        for (var i = 0; i < index; i++) {                               //draw other players
+            this.otherPlayers[i].draw();
         }
         animate();
         console.log('start');
@@ -142,11 +149,9 @@ function animate() {
     Arrow.prototype.context.clearRect(0, 0, window.innerWidth, window.innerHeight);
     game.player.draw();        //draw player
     game.player.quiver.animate();
-    for (var i = 0; i < size; i++) {                               //draw other players
-        if (game.otherPlayers[i].connected === true) {
-            game.otherPlayers[i].draw();
-            game.otherPlayers[i].quiver.animate();
-        }
+    for (var i = 0; i < index; i++) {                               //draw other players
+      game.otherPlayers[i].draw();
+      game.otherPlayers[i].quiver.animate();
     }
     if (key.dx != 0 || key.dy != 0 || key.rotate) {
         socket.emit('input', JSON.stringify(key));
@@ -276,15 +281,6 @@ function Player() {
     }
 }
 
-var ImageAsset = new function () {
-    this.background = new Image();
-    this.background.src = "/img/top-down-dungeon.jpg";
-    this.bow = new Image();
-    this.bow.src = "/img/bow.png";
-    this.arrow = new Image();
-    this.arrow.src = "/img/arrow.png";
-}
-
 function DrawableObj() {
     this.x = 0;
     this.y = 0;
@@ -308,6 +304,8 @@ function Arrow() {
     this.angle = 0;
     this.originX = 0;
     this.originY = 0;
+    this.width = ImageAsset.arrow.width * 0.3;
+    this.height = ImageAsset.arrow.height * 0.3;
 
     this.init = function(x, y) {
       this.x = x;
@@ -317,13 +315,22 @@ function Arrow() {
     this.draw = function () {
         this.context.translate(this.originX, this.originY);
         this.context.rotate(+this.angle);
-        this.x += this.speed;
-        if (this.x >= 1853 || this.y >= 951) {
+        /*
+        for (var i = 0; i < index; i++) {
+          if (LineCollision({x: this.originX + Math.cos(this.angle)*(this.x + this.speed), y: this.originY + Math.sin(this.angle)*(this.x + this.speed)}, {x: this.originX + Math.cos(this.angle)*this.x, y: this.originY + Math.sin(this.angle)*this.x}, {x: game.otherPlayers[i].x - game.otherPlayers[i].r, y: game.otherPlayers[i].y + game.otherPlayers[i].r}, {x: game.otherPlayers[i].x - game.otherPlayers[i].r, y: game.otherPlayers[i].y - game.otherPlayers[i].r}) || LineCollision({x: this.originX + Math.cos(this.angle)*(this.x + this.speed), y: this.originY + Math.sin(this.angle)*(this.x + this.speed)}, {x: this.originX + Math.cos(this.angle)*this.x, y: this.originY + Math.sin(this.angle)*this.x}, {x: game.otherPlayers[i].x - game.otherPlayers[i].r, y: game.otherPlayers[i].y + game.otherPlayers[i].r}, {x: game.otherPlayers[i].x + game.otherPlayers[i].r, y: game.otherPlayers[i].y + game.otherPlayers[i].r}) || LineCollision({x: this.originX + Math.cos(this.angle)*(this.x + this.speed), y: this.originY + Math.sin(this.angle)*(this.x + this.speed)}, {x: this.originX + Math.cos(this.angle)*this.x, y: this.originY + Math.sin(this.angle)*this.x}, {x: game.otherPlayers[i].x - game.otherPlayers[i].r, y: game.otherPlayers[i].y - game.otherPlayers[i].r}, {x: game.otherPlayers[i].x + game.otherPlayers[i].r, y: game.otherPlayers[i].y - game.otherPlayers[i].r}) || LineCollision({x: this.originX + Math.cos(this.angle)*(this.x + this.speed), y: this.originY + Math.sin(this.angle)*(this.x + this.speed)}, {x: this.originX + Math.cos(this.angle)*this.x, y: this.originY + Math.sin(this.angle)*this.x}, {x: game.otherPlayers[i].x + game.otherPlayers[i].r, y: game.otherPlayers[i].y - game.otherPlayers[i].r}, {x: game.otherPlayers[i].x + game.otherPlayers[i].r, y: game.otherPlayers[i].y + game.otherPlayers[i].r}) ) {
             this.context.rotate(-this.angle);
             this.context.translate(- this.originX,- this.originY);
             return true;
+          }
+        }
+        */
+        if (LineCollision({x: this.originX + Math.cos(this.angle)*(this.x + this.speed), y: this.originY + Math.sin(this.angle)*(this.x + this.speed)}, {x: this.originX + Math.cos(this.angle)*this.x, y: this.originY + Math.sin(this.angle)*this.x}, {x: 0, y: 0}, {x: 0, y: 900}) ||LineCollision({x: this.originX + Math.cos(this.angle)*(this.x + this.speed), y: this.originY + Math.sin(this.angle)*(this.x + this.speed)}, {x: this.originX + Math.cos(this.angle)*this.x, y: this.originY + Math.sin(this.angle)*this.x}, {x: 0, y: 0}, {x: 1853, y: 0}) || LineCollision({x: this.originX + Math.cos(this.angle)*(this.x + this.speed), y: this.originY + Math.sin(this.angle)*(this.x + this.speed)}, {x: this.originX + Math.cos(this.angle)*this.x, y: this.originY + Math.sin(this.angle)*this.x}, {x: 1853, y: 0}, {x: 1853, y: 900}) || LineCollision({x: this.originX + Math.cos(this.angle)*(this.x + this.speed), y: this.originY + Math.sin(this.angle)*(this.x + this.speed)}, {x: this.originX + Math.cos(this.angle)*this.x, y: this.originY + Math.sin(this.angle)*this.x}, {x: 0, y: 900}, {x: 1853, y: 900})) {
+          this.context.rotate(-this.angle);
+          this.context.translate(- this.originX,- this.originY);
+          return true;
         } else {
-            this.context.drawImage(ImageAsset.arrow,this.x - ImageAsset.arrow.width * 0.3/2, 0 - ImageAsset.arrow.height/2 * 0.3, ImageAsset.arrow.width * 0.3, ImageAsset.arrow.height * 0.3);
+            this.x += this.speed;
+            this.context.drawImage(ImageAsset.arrow,this.x - ImageAsset.arrow.width * 0.3/2, 0 - ImageAsset.arrow.height * 0.3/2, ImageAsset.arrow.width * 0.3, ImageAsset.arrow.height * 0.3);
         }
         this.context.rotate(-this.angle);
         this.context.translate(- this.originX,- this.originY);
@@ -357,7 +364,6 @@ function Pool(maxCapacity) {
     this.get = function (x, y, angle) {
         if (!pool[size-1].alive) {
             pool[size-1].spawn(x, y, angle);
-            //console.log('fire');
             pool.unshift(pool.pop());
         }
     };
@@ -374,6 +380,28 @@ function Pool(maxCapacity) {
         }
     };
 }
+
+function LineCollision(p1, p2, p3, p4) {
+    var d = ((p4.y - p3.y) * (p2.x - p1.x)) - ((p4.x - p3.x) * (p2.y - p1.y));
+    var n1 = ((p4.x - p3.x) * (p1.y - p3.y)) - ((p4.y - p3.y) * (p1.x - p3.x));
+    var n2 = ((p2.x - p1.x) * (p1.y - p3.y)) - ((p2.y - p1.y) * (p1.x - p3.x));
+
+    if ( d == 0.0 )
+    {
+        if ( n1 == 0.0 && n2 == 0.0 )
+        {
+            return false;  //COINCIDENT;
+        }
+
+        return false;   // PARALLEL;
+    }
+
+    var ua = n1 / d;
+    var ub = n2 / d;
+    //console.log(p1.x + ',' + p1.y + ',' + p2.x + ',' + p2.y);
+    return (ua >= 0.0 && ua <= 1.0 && ub >= 0.0 && ub <= 1.0);
+}
+
 
 //Arrow.prototype = new DrawableObj();
 Background.prototype = new DrawableObj();
