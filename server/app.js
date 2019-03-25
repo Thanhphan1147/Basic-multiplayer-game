@@ -72,7 +72,8 @@ io.on('connection', (socket) => {
     socket.on('newplayer', (val) => {
         var player = JSON.parse(val);
         pool[index].connected = true;
-        pool[index].id = socket.id;
+        pool[index].socket = socket.id;
+        pool[index].id = index;
         pool[index].name = player.name;
         pool[index].init(randomX(), randomY(), player.color);
         //console.log('added');
@@ -81,27 +82,24 @@ io.on('connection', (socket) => {
         socket.emit('gameState', JSON.stringify(pool));
         io.emit('addplayer', JSON.stringify(pool[index]));
         index++;
+        socket.join('active');
     })
 
     socket.on('input', (key) => {
-        var pos = JSON.parse(key)
-        for (var i = 0; i < index; i++) {
-            if (pool[i].id === socket.id) {
-                pool[i].x = pool[i].x + pos.dx;
-                pool[i].y = pool[i].y + pos.dy;
-                pool[i].angle = pos.angle;
-                if (ColisionDetector(i) || pool[i].x + pool[i].r >= 1853 || pool[i].y + pool[i].r >= 951 || pool[i].x - pool[i].r <= 0 || pool[i].y + pool[i].r <= 0) {
-                    pool[i].x = pool[i].x - pos.dx;
-                    pool[i].y = pool[i].y - pos.dy;
-                }
-            }
+        var pos = JSON.parse(key);
+        pool[pos.id].x = pool[pos.id].x + pos.dx;
+        pool[pos.id].y = pool[pos.id].y + pos.dy;
+        pool[pos.id].angle = pos.angle;
+        if (ColisionDetector(pos.id) || pool[pos.id].x + pool[pos.id].r >= 1853 || pool[pos.id].y + pool[pos.id].r >= 951 || pool[pos.id].x - pool[pos.id].r <= 0 || pool[pos.id].y + pool[pos.id].r <= 0) {
+            pool[pos.id].x = pool[pos.id].x - pos.dx;
+            pool[pos.id].y = pool[pos.id].y - pos.dy;
         }
     })
 
-    socket.on('Mouseclick', (data) => {
+    socket.on('Mousec', (data) => {
       var player = JSON.parse(data);
       if (!arrowPool[size-1].alive) {
-          arrowPool[size-1].spawn(x, y, angle);
+          arrowPool[size-1].spawn(player.x, player.y, player.angle);
           //console.log('fire');
           arrowPool.unshift(arrowPool.pop());
           arrow_count ++;
@@ -109,13 +107,13 @@ io.on('connection', (socket) => {
     })
     socket.on('disconnect', () => {
         for (var i = 0; i < index; i++) {
-            if (pool[i].id === socket.id) {
+            if (pool[i].socket === socket.id) {
                 pool[i].reset();
                 pool.push(pool.splice(i, 1));
                 index--;
             }
         }
-        console.log('user disconnected')
+        console.log('user disconnected');
     })
 })
 
@@ -139,9 +137,9 @@ function Tick() {
 setInterval( () => {
   //console.log(Tick());
   if (index > 0) {
-    io.emit('gametick', JSON.stringify(Tick()));
+    io.in('active').emit('update', JSON.stringify(pool));
   }
-}, 500);
+}, 1000/60);
 
 http.listen(8080, function () {
     console.log('listening on port 8080');

@@ -3,6 +3,7 @@ socket = io.connect('http://localhost:8080');
 var size = 3;
 var index = 0;
 var key = {
+    id: 'N/A',
     dx: 0,
     dy: 0,
     angle: 0,
@@ -148,12 +149,15 @@ function animate() {
             game.otherPlayers[i].quiver.animate();
         }
     }
-    if (key.dx != 0 || key.dy != 0 || key.rotate) {
-        socket.emit('input', JSON.stringify(key));
-        key.rotate = false;
-    }
     requestAnimFrame(animate);
 }
+
+setInterval(() => {
+  if (key.dx != 0 || key.dy != 0 || key.rotate) {
+      socket.emit('input', JSON.stringify(key));
+      key.rotate = false;
+  }
+},1000/60);
 
 socket.on('gameState', (pool) => {
     var state = JSON.parse(pool);
@@ -177,6 +181,7 @@ socket.on('player_data', (val) => {
     game.player.name = pos.name;
     game.player.init(pos.x, pos.y, pos.color, pos.angle);
     game.player.id = pos.id;
+    key.id = pos.id;
 })
 
 socket.on('addplayer', (val) => {
@@ -192,21 +197,17 @@ socket.on('addplayer', (val) => {
 })
 
 socket.on('update', (val) => {
-    var pos = JSON.parse(val);
-    if (pos.id === game.player.id) {
-        game.player.x = pos.x;
-        game.player.y = pos.y;
-        game.player.angle = pos.angle;
-    } else {
-        for (var i = 0; i < index; i++) {
-            if (game.otherPlayers[i].id === pos.id) {
-                game.otherPlayers[i].x = pos.x;
-                game.otherPlayers[i].y = pos.y;
-                game.otherPlayers[i].angle = pos.angle;
-            }
-        }
-    }
-
+  var pos = JSON.parse(val);
+  //console.log(game.player.id + ' ' + pos[game.player.id]);
+  game.player.x = pos[game.player.id].x;
+  game.player.y = pos[game.player.id].y;
+  game.player.angle = pos[game.player.id].angle;
+  for (var i = 0; i < index; i++) {
+    console.log(game.otherPlayers[i].id);
+    game.otherPlayers[i].x = pos[game.otherPlayers[i].id].x;
+    game.otherPlayers[i].y = pos[game.otherPlayers[i].id].y;
+    game.otherPlayers[i].angle = pos[game.otherPlayers[i].id].angle;
+  }
 })
 
 socket.on('Fire!', (id) => {
@@ -218,19 +219,6 @@ socket.on('Fire!', (id) => {
           if (game.otherPlayers[i].id === id) {
             game.otherPlayers[i].quiver.get(game.otherPlayers[i].x, game.otherPlayers[i].y, game.otherPlayers[i].angle);
           }
-      }
-  }
-})
-
-socket.on('gametick', (data) => {
-  game.player.context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-  Arrow.prototype.context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-  game.player.draw();                                            //draw player
-  game.player.quiver.animate();
-  for (var i = 0; i < size; i++) {                               //draw other players
-      if (game.otherPlayers[i].connected === true) {
-          game.otherPlayers[i].draw();
-          game.otherPlayers[i].quiver.animate();
       }
   }
 })

@@ -2,6 +2,7 @@
 module.exports = class Player {
   constructor() {
     this.connected = false;
+    this.socket = 'N/A';
     this.id = 'N/A';
     this.x = 0;
     this.y = 0;
