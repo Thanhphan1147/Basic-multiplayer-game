@@ -1,4 +1,4 @@
-
+const Arrow = require('Arrow.js');
 module.exports = class Player {
   constructor() {
     this.connected = false;
@@ -10,6 +10,7 @@ module.exports = class Player {
     this.angle = 0;
     this.color = 'undefined';
     this.name = 'not connected';
+    this.arrow = new Arrow();
   }
 
     init(x, y, color) {

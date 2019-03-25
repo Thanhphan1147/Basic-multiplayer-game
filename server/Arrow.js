@@ -1,19 +1,18 @@
 module.exports = class Arrow {
   constructor() {
+    this.pX = 0;
+    this.pY = 0;
     this.x = 0;
-    this.y = 0;
     this.angle = 0;
     this.alive = false;
-    this.speed = 20
+    this.speed = 10;
   }
 
-  init(x, y, angle) {
-    this.x = x;
-    this.y = y;
-    this.angle = angle;
-  }
   spawn() {
     this.alive = true;
+    this.pX = x;
+    this.pY = y;
+    this.angle = angle;
   }
 
   update() {
@@ -24,8 +23,9 @@ module.exports = class Arrow {
   }
 
   reset() {
+    this.pX = 0;
+    this.pY = 0;
     this.x = 0;
-    this.y = 0;
     this.alive = false;
   }
 }

@@ -324,7 +324,7 @@ function Arrow() {
             this.context.translate(- this.originX,- this.originY);
             return true;
         } else {
-            this.context.drawImage(ImageAsset.arrow,this.x - ImageAsset.arrow.width * 0.3/2, 0 - ImageAsset.arrow.height/2 * 0.3, ImageAsset.arrow.width * 0.3, ImageAsset.arrow.height * 0.3);
+            this.context.drawImage(ImageAsset.arrow,this.x - ImageAsset.arrow.width * 0.1/2, 0 - ImageAsset.arrow.height/2 * 0.1, ImageAsset.arrow.width * 0.1, ImageAsset.arrow.height * 0.1);
         }
         this.context.rotate(-this.angle);
         this.context.translate(- this.originX,- this.originY);

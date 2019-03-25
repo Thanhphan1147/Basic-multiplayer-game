@@ -9,11 +9,8 @@ const Arrow = require('./Arrow.js');
 //Variables and function declaration
 var index = 0;
 var size = 4;
-var size2 = size * 10;
-var arrow_count = 0;
 
 var pool = [size];
-var arrowPool = [size2];
 
 function randomX() {
     var x = Math.floor((Math.random() * (1600 - 400) + 1));
@@ -31,12 +28,6 @@ function initPlayers() {
     for (var i = 0; i < size; i++) {
         var player = new Player();
         pool[i] = player;
-    }
-}
-function initArrows() {
-    for (var i = 0; i < size2; i++) {
-        var arrow = new Arrow();
-        arrowPool[i] = arrow;
     }
 }
 //console.log(pool[0]);
@@ -59,7 +50,6 @@ function ColisionDetector(key) {
 }
 
 initPlayers();
-initArrows();
 //-----------------------//
 app.use(express.static('public'));
 app.get('/', (req, res) => {
@@ -96,13 +86,10 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('Mousec', (data) => {
+    socket.on('Mouseclick', (data) => {
       var player = JSON.parse(data);
-      if (!arrowPool[size-1].alive) {
-          arrowPool[size-1].spawn(player.x, player.y, player.angle);
-          //console.log('fire');
-          arrowPool.unshift(arrowPool.pop());
-          arrow_count ++;
+      if(!pool[player.id].arrow.alive) {
+        pool[player.id].arrow.spawn(player.x, player.y, player.angle);
       }
     })
     socket.on('disconnect', () => {
@@ -119,19 +106,10 @@ io.on('connection', (socket) => {
 
 //handle game logic, colision detector,....
 function Tick() {
-  for(var i = 0; i < arrow_count; i++) {
-    if(arrowPool[i].x > 800 ) {
-      arrowPool[i].reset();
-      arrowPool.push((arrowPool.splice(i,1))[0]);
-    } else {
-      arrowPool[i].update();
-    }
+  for(var i = 0; i < index; i++) {
+    pool[i].arrow.update();
   }
 
-  return {
-    players: pool,
-    arrows: arrowPool
-  }
 }
 
 setInterval( () => {
