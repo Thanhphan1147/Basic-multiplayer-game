@@ -5,7 +5,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 //Local modules
 const Player = require('./Player.js');
-const Arrow = require('./Arrow.js');
+
 //Variables and function declaration
 var index = 0;
 var size = 4;
@@ -111,6 +111,12 @@ io.on('connection', (socket) => {
       var player = JSON.parse(data);
       if(!pool[player.id].arrow.alive) {
         pool[player.id].arrow.spawn(player.x, player.y, player.angle);
+        io.emit('fire', JSON.stringify({
+          id: player.id,
+          pX: player.x,
+          pY: player.y,
+          angle: player.angle
+        }));
       }
     })
     socket.on('disconnect', () => {
@@ -133,15 +139,18 @@ function Tick() {
       y: pool[i].arrow.pY + Math.sin(pool[i].arrow.angle)*(pool[i].arrow.x)
     }
     var b = {
-      x: a.x + Math.cos(pool[i].arrow.angle)*pool[i].arrow.speed;
-      y: a.y + Math.sin(pool[i].arrow.angle)*pool[i].arrow.speed;
+      x: a.x + Math.cos(pool[i].arrow.angle)*pool[i].arrow.speed,
+      y: a.y + Math.sin(pool[i].arrow.angle)*pool[i].arrow.speed
     }
     for(var j = 0; j < index; j++) {
       if(j != i) {
-        if(LineCollision(a, b, {x: pool[j].x,y: pool[j].y - pool[j].r}, {x: pool[j].x,y: pool[j].y - pool[j].r})) {
+        if(LineCollision(a, b, {x: pool[j].x,y: pool[j].y - pool[j].r}, {x: pool[j].x,y: pool[j].y + pool[j].r})) {
           pool[i].arrow.reset();
         }
       }
+    }
+    if(pool[i].arrow.x >= 1000) {
+      pool[i].arrow.reset();
     }
     pool[i].arrow.update();
   }

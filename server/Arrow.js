@@ -5,10 +5,10 @@ module.exports = class Arrow {
     this.x = 0;
     this.angle = 0;
     this.alive = false;
-    this.speed = 10;
+    this.speed = 20;
   }
 
-  spawn() {
+  spawn(x, y, angle) {
     this.alive = true;
     this.pX = x;
     this.pY = y;

@@ -1,4 +1,4 @@
-const Arrow = require('Arrow.js');
+const Arrow = require('./Arrow.js');
 module.exports = class Player {
   constructor() {
     this.connected = false;

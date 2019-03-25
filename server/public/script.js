@@ -142,11 +142,15 @@ function animate() {
     game.player.context.clearRect(0, 0, window.innerWidth, window.innerHeight);
     Arrow.prototype.context.clearRect(0, 0, window.innerWidth, window.innerHeight);
     game.player.draw();        //draw player
-    game.player.quiver.animate();
+    if(game.player.arrow.alive) {
+      game.player.arrow.draw();
+    }
     for (var i = 0; i < size; i++) {                               //draw other players
         if (game.otherPlayers[i].connected === true) {
             game.otherPlayers[i].draw();
-            game.otherPlayers[i].quiver.animate();
+            if(game.otherPlayers[i].arrow.alive) {
+              game.otherPlayers[i].arrow.draw();
+            }
         }
     }
     requestAnimFrame(animate);
@@ -202,22 +206,29 @@ socket.on('update', (val) => {
   game.player.x = pos[game.player.id].x;
   game.player.y = pos[game.player.id].y;
   game.player.angle = pos[game.player.id].angle;
+  game.player.arrow.alive = pos[game.player.id].arrow.alive;
+  game.player.arrow.x = pos[game.player.id].arrow.x;
   for (var i = 0; i < index; i++) {
-    console.log(game.otherPlayers[i].id);
+    //console.log(game.otherPlayers[i].id);
     game.otherPlayers[i].x = pos[game.otherPlayers[i].id].x;
     game.otherPlayers[i].y = pos[game.otherPlayers[i].id].y;
     game.otherPlayers[i].angle = pos[game.otherPlayers[i].id].angle;
+    game.otherPlayers[i].arrow.alive = pos[game.otherPlayers[i].id].arrow.alive;
+    game.otherPlayers[i].arrow.x = pos[game.otherPlayers[i].id].arrow.x;
   }
 })
 
-socket.on('Fire!', (id) => {
+socket.on('fire', (id) => {
   //console.log('input: ' + id);
-  if (id === game.player.id) {
-      game.player.quiver.get(game.player.x, game.player.y, game.player.angle);
+  var pos = JSON.parse(id);
+  if (pos.id === game.player.id) {
+      game.player.arrow.spawn(pos.pX, pos.pY, pos.angle);
+      //console.log(game.player.arrow);
   } else {
       for (var i = 0; i < index; i++) {
-          if (game.otherPlayers[i].id === id) {
-            game.otherPlayers[i].quiver.get(game.otherPlayers[i].x, game.otherPlayers[i].y, game.otherPlayers[i].angle);
+          if (game.otherPlayers[i].id === pos.id) {
+            game.otherPlayers[i].arrow.spawn(pos.pX, pos.pY, pos.angle);
+            console.log(game.otherPlayers[i].arrow);
           }
       }
   }
@@ -234,8 +245,7 @@ function Player() {
     this.connected = false;
     this.colision = false;
 
-    this.quiver = new Pool(10);
-    this.quiver.init();
+    this.arrow = new Arrow();
 
     this.init = function (x, y, color, angle) {
         this.x = x;
@@ -266,7 +276,7 @@ function Player() {
         this.context.fillStyle = this.color;
         this.context.fill();
         this.context.stroke();
-        this.context.drawImage(ImageAsset.bow, 0 - ImageAsset.bow.width * 0.3/2, 0 - ImageAsset.bow.height * 0.3/2, ImageAsset.bow.width * 0.3, ImageAsset.bow.height * 0.3);
+        this.context.drawImage(ImageAsset.bow, 0 - ImageAsset.bow.width * 0.2/2, 0 - ImageAsset.bow.height * 0.2/2, ImageAsset.bow.width * 0.2, ImageAsset.bow.height * 0.2);
         //  rotate
         this.context.rotate(-this.angle);
         this.context.translate(-this.x,-this.y);
@@ -309,32 +319,22 @@ function Arrow() {
     this.angle = 0;
     this.originX = 0;
     this.originY = 0;
-
-    this.init = function(x, y) {
-      this.x = x;
-      this.y = y;
-    }
+    this.x = 0;
 
     this.draw = function () {
         this.context.translate(this.originX, this.originY);
         this.context.rotate(+this.angle);
-        this.x += this.speed;
-        if (this.x >= 1853 || this.y >= 951) {
-            this.context.rotate(-this.angle);
-            this.context.translate(- this.originX,- this.originY);
-            return true;
-        } else {
-            this.context.drawImage(ImageAsset.arrow,this.x - ImageAsset.arrow.width * 0.1/2, 0 - ImageAsset.arrow.height/2 * 0.1, ImageAsset.arrow.width * 0.1, ImageAsset.arrow.height * 0.1);
-        }
+        this.context.drawImage(ImageAsset.arrow,this.x - ImageAsset.arrow.width * 0.2/2, 0 - ImageAsset.arrow.height/2 * 0.2, ImageAsset.arrow.width * 0.2, ImageAsset.arrow.height * 0.2);
         this.context.rotate(-this.angle);
         this.context.translate(- this.originX,- this.originY);
-        return false;
     };
 
     this.reset = function () {
-        this.x = 0;
-        this.y = 0;
-        this.alive = false;
+      this.angle = 0;
+      this.originX = 0;
+      this.originY = 0;
+      this.x = 0;
+      this.alive = false;
     };
 
     this.spawn = function (x, y, angle) {
@@ -342,37 +342,6 @@ function Arrow() {
         this.angle = angle;
         this.originX = x;
         this.originY = y;
-    };
-}
-
-function Pool(maxCapacity) {
-    var size = maxCapacity;
-    var pool = [];
-    this.init = function () {
-      for (var i = 0; i < size; i++) {
-          var arrow = new Arrow();
-          arrow.init(0,0);
-          pool[i] = arrow;
-      }
-    };
-    this.get = function (x, y, angle) {
-        if (!pool[size-1].alive) {
-            pool[size-1].spawn(x, y, angle);
-            //console.log('fire');
-            pool.unshift(pool.pop());
-        }
-    };
-    this.animate = function () {
-        for (var i = 0; i < size; i++) {
-            if (pool[i].alive) {
-                if (pool[i].draw()) {
-                    //console.log('exception reset');
-                    pool[i].reset();
-                    pool.push((pool.splice(i,1))[0]);
-                }
-            } else
-                break;
-        }
     };
 }
 
