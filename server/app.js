@@ -128,6 +128,21 @@ io.on('connection', (socket) => {
 //handle game logic, colision detector,....
 function Tick() {
   for(var i = 0; i < index; i++) {
+    var a = {
+      x: pool[i].arrow.pX + Math.cos(pool[i].arrow.angle)*(pool[i].arrow.x),
+      y: pool[i].arrow.pY + Math.sin(pool[i].arrow.angle)*(pool[i].arrow.x)
+    }
+    var b = {
+      x: a.x + Math.cos(pool[i].arrow.angle)*pool[i].arrow.speed;
+      y: a.y + Math.sin(pool[i].arrow.angle)*pool[i].arrow.speed;
+    }
+    for(var j = 0; j < index; j++) {
+      if(j != i) {
+        if(LineCollision(a, b, {x: pool[j].x,y: pool[j].y - pool[j].r}, {x: pool[j].x,y: pool[j].y - pool[j].r})) {
+          pool[i].arrow.reset();
+        }
+      }
+    }
     pool[i].arrow.update();
   }
 
@@ -136,6 +151,7 @@ function Tick() {
 setInterval( () => {
   //console.log(Tick());
   if (index > 0) {
+    Tick();
     io.in('active').emit('update', JSON.stringify(pool));
   }
 }, 1000/60);
