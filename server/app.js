@@ -146,6 +146,7 @@ function Tick() {
       if(j != i) {
         if(LineCollision(a, b, {x: pool[j].x,y: pool[j].y - pool[j].r}, {x: pool[j].x,y: pool[j].y + pool[j].r})) {
           pool[i].arrow.reset();
+          pool[j].health -= 10;
         }
       }
     }

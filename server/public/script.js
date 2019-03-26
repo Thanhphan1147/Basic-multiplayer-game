@@ -206,6 +206,7 @@ socket.on('update', (val) => {
   game.player.x = pos[game.player.id].x;
   game.player.y = pos[game.player.id].y;
   game.player.angle = pos[game.player.id].angle;
+  game.player.health = pos[game.player.id].health;
   game.player.arrow.alive = pos[game.player.id].arrow.alive;
   game.player.arrow.x = pos[game.player.id].arrow.x;
   for (var i = 0; i < index; i++) {
@@ -213,6 +214,7 @@ socket.on('update', (val) => {
     game.otherPlayers[i].x = pos[game.otherPlayers[i].id].x;
     game.otherPlayers[i].y = pos[game.otherPlayers[i].id].y;
     game.otherPlayers[i].angle = pos[game.otherPlayers[i].id].angle;
+    game.otherPlayers[i].health = pos[game.otherPlayers[i].id].health;
     game.otherPlayers[i].arrow.alive = pos[game.otherPlayers[i].id].arrow.alive;
     game.otherPlayers[i].arrow.x = pos[game.otherPlayers[i].id].arrow.x;
   }
@@ -244,6 +246,7 @@ function Player() {
     this.name = 'not connected';
     this.connected = false;
     this.colision = false;
+    this.health = 100;
 
     this.arrow = new Arrow();
 
@@ -284,6 +287,12 @@ function Player() {
         this.context.font = "15px Comic Sans MS";
         this.context.fillStyle = 'black';
         this.context.fillText(this.name, this.x - this.context.measureText(this.name).width / 2, this.y - this.r - this.r/6);
+        //health  bar
+        this.context.beginPath();
+        this.context.rect(this.x - 50, this.y + this.r + this.r/6, this.health, 20);
+        this.context.fillStyle = 'green';
+        this.context.fill();
+        this.context.stroke();
     }
 }
 
