@@ -178,7 +178,11 @@ function Tick() {
       if(j != i) {
         if(LineCollision(a, b, {x: pool[j].x,y: pool[j].y - pool[j].r}, {x: pool[j].x,y: pool[j].y + pool[j].r})) {
           pool[i].arrow.reset();
-          pool[j].health -= 10;
+          if(pool[j].health = 10) {
+            pool[j].health = 100;
+          } else {
+            pool[j].health -= 10;
+          }
         }
       }
     }
@@ -198,6 +202,6 @@ setInterval( () => {
   }
 }, 1000/60);
 
-http.listen(8080, function () {
-    console.log('listening on port 8080');
+http.listen(6969, function () {
+    console.log('listening on port 6969');
 })

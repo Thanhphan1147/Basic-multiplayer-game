@@ -10,6 +10,7 @@ module.exports = class Player {
     this.color = 'undefined';
     this.name = 'not connected';
     this.health = 100;
+    this.kills = 0;
     this.arrow = new Arrow();
   }
 
@@ -26,6 +27,8 @@ module.exports = class Player {
       this.angle = 0;
       this.color = 'undefined';
       this.name = 'not connected';
+      this.health = 100;
+      this.kills = 0;
       this.arrow.reset();
     }
 }
