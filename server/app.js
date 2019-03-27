@@ -151,6 +151,7 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         for (var i = 0; i < index; i++) {
             if (pool[i].id === socket.id) {
+                io.emit('disconnect', socket.id);
                 pool[i].reset();
                 //console.log(pool[i].init);
                 pool.splice(i,1);
@@ -178,7 +179,7 @@ function Tick() {
       if(j != i) {
         if(LineCollision(a, b, {x: pool[j].x,y: pool[j].y - pool[j].r}, {x: pool[j].x,y: pool[j].y + pool[j].r})) {
           pool[i].arrow.reset();
-          if(pool[j].health = 10) {
+          if(pool[j].health === 10) {
             pool[j].health = 100;
           } else {
             pool[j].health -= 10;
@@ -202,6 +203,6 @@ setInterval( () => {
   }
 }, 1000/60);
 
-http.listen(6969, function () {
-    console.log('listening on port 6969');
+http.listen(8080, function () {
+    console.log('listening on port 8080');
 })

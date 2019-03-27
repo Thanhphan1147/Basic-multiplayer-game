@@ -259,6 +259,17 @@ socket.on('fire', (id) => {
   }
 })
 
+socket.on('disconnect', (id) => {
+  for (var i = 0; i <index; i++) {
+    if(game.otherPlayers[i].id === id) {
+      //game.otherPlayers[i].reset();
+      //console.log(pool[i].init);
+      game.otherPlayers.splice(i,1);
+      game.otherPlayers.push(new Player());
+    }
+  }
+})
+
 function Player() {
     this.id = 'N/A';
     this.x = 0;
