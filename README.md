@@ -9,3 +9,7 @@ npm install
 node app.js or npm run start to start the server through terminal (windows cmd). 
   
 Dudes now have giant long bow to shoot people
+
+- v2 changed most of the server code to simulate gametick
+- added proper collision detection mechanics
+- added health bars
