@@ -202,6 +202,28 @@ socket.on('addplayer', (val) => {
 
 socket.on('update', (val) => {
   var pos = JSON.parse(val);
+  for (var i = 0; i < pos.length; i++) {
+    if(pos[i].id === game.player.id) {
+      game.player.x = pos[i].x;
+      game.player.y = pos[i].y;
+      game.player.angle = pos[i].angle;
+      game.player.health = pos[i].health;
+      game.player.arrow.alive = pos[i].arrow.alive;
+      game.player.arrow.x = pos[i].arrow.x;
+    } else {
+      for (var j = 0; j < index; j++) {
+        if (game.otherPlayers[j].id === pos[i].id) {
+          game.otherPlayers[j].x = pos[i].x;
+          game.otherPlayers[j].y = pos[i].y;
+          game.otherPlayers[j].angle = pos[i].angle;
+          game.otherPlayers[j].health = pos[i].health;
+          game.otherPlayers[j].arrow.alive = pos[i].arrow.alive;
+          game.otherPlayers[j].arrow.x = pos[i].arrow.x;
+        }
+      }
+    }
+  }
+  /*
   //console.log(game.player.id + ' ' + pos[game.player.id]);
   game.player.x = pos[game.player.id].x;
   game.player.y = pos[game.player.id].y;
@@ -218,6 +240,7 @@ socket.on('update', (val) => {
     game.otherPlayers[i].arrow.alive = pos[game.otherPlayers[i].id].arrow.alive;
     game.otherPlayers[i].arrow.x = pos[game.otherPlayers[i].id].arrow.x;
   }
+  */
 })
 
 socket.on('fire', (id) => {
@@ -289,7 +312,7 @@ function Player() {
         this.context.fillText(this.name, this.x - this.context.measureText(this.name).width / 2, this.y - this.r - this.r/6);
         //health  bar
         this.context.beginPath();
-        this.context.rect(this.x - 50, this.y + this.r + this.r/6, this.health, 20);
+        this.context.rect(this.x - 50, this.y + this.r + this.r/6, this.health, 10);
         this.context.fillStyle = 'green';
         this.context.fill();
         this.context.stroke();
