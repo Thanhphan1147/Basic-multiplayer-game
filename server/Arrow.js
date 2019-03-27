@@ -6,8 +6,7 @@ module.exports = class Arrow {
     this.angle = 0;
     this.alive = false;
     this.speed = 20;
-    this.health = 100;
-  }
+}
 
   spawn(x, y, angle) {
     this.alive = true;
@@ -27,6 +26,7 @@ module.exports = class Arrow {
     this.pX = 0;
     this.pY = 0;
     this.x = 0;
+    this.angle = 0;
     this.alive = false;
   }
 }

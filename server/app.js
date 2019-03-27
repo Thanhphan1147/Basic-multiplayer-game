@@ -83,8 +83,7 @@ io.on('connection', (socket) => {
     socket.on('newplayer', (val) => {
         var player = JSON.parse(val);
         pool[index].connected = true;
-        pool[index].socket = socket.id;
-        pool[index].id = index;
+        pool[index].id = socket.id;
         pool[index].name = player.name;
         pool[index].init(randomX(), randomY(), player.color);
         //console.log('added');
@@ -98,6 +97,18 @@ io.on('connection', (socket) => {
 
     socket.on('input', (key) => {
         var pos = JSON.parse(key);
+        for (var i = 0; i < index; i++) {
+          if(pool[i].id === pos.id) {
+            pool[i].x = pool[i].x + pos.dx;
+            pool[i].y = pool[i].y + pos.dy;
+            pool[i].angle = pos.angle;
+            if (ColisionDetector(i) || pool[i].x + pool[i].r >= 1853 || pool[i].y + pool[i].r >= 951 || pool[i].x - pool[i].r <= 0 || pool[i].y + pool[i].r <= 0) {
+                pool[i].x = pool[i].x - pos.dx;
+                pool[i].y = pool[i].y - pos.dy;
+            }
+          }
+        }
+/*
         pool[pos.id].x = pool[pos.id].x + pos.dx;
         pool[pos.id].y = pool[pos.id].y + pos.dy;
         pool[pos.id].angle = pos.angle;
@@ -105,10 +116,26 @@ io.on('connection', (socket) => {
             pool[pos.id].x = pool[pos.id].x - pos.dx;
             pool[pos.id].y = pool[pos.id].y - pos.dy;
         }
+*/
     })
 
     socket.on('Mouseclick', (data) => {
-      var player = JSON.parse(data);
+      var pos = JSON.parse(data);
+      for (var i = 0; i < index; i++) {
+        if(pool[i].id === pos.id) {
+          if(!pool[i].arrow.alive) {
+            pool[i].arrow.spawn(pos.x, pos.y, pos.angle);
+            io.emit('fire', JSON.stringify({
+              id: pos.id,
+              pX: pos.x,
+              pY: pos.y,
+              angle: pos.angle
+            }));
+          }
+        }
+      }
+    })
+      /*
       if(!pool[player.id].arrow.alive) {
         pool[player.id].arrow.spawn(player.x, player.y, player.angle);
         io.emit('fire', JSON.stringify({
@@ -119,11 +146,16 @@ io.on('connection', (socket) => {
         }));
       }
     })
+    */
+
     socket.on('disconnect', () => {
         for (var i = 0; i < index; i++) {
-            if (pool[i].socket === socket.id) {
+            if (pool[i].id === socket.id) {
                 pool[i].reset();
-                pool.push(pool.splice(i, 1));
+                //console.log(pool[i].init);
+                pool.splice(i,1);
+                pool.push(new Player());
+                //console.log(pool[size-1].init);
                 index--;
             }
         }
