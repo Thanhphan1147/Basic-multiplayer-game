@@ -1,5 +1,6 @@
 socket = io.connect('http://localhost:8080');
 //socket = io.connect('http://192.168.1.18:8080');
+var timer = 0;
 var size = 3;
 var index = 0;
 var key = {
@@ -25,6 +26,9 @@ function Preload() {
     }
     preloaddiv.style.display = 'none';
     socket.emit('newplayer', JSON.stringify(preload));
+}
+
+function Message(player, val) {
 }
 
 var game = new Game();
@@ -139,6 +143,7 @@ function Game() {
 }
 
 function animate() {
+    clearSelection();
     game.player.context.clearRect(0, 0, window.innerWidth, window.innerHeight);
     Arrow.prototype.context.clearRect(0, 0, window.innerWidth, window.innerHeight);
     game.player.draw();        //draw player
@@ -259,13 +264,20 @@ socket.on('fire', (id) => {
   }
 })
 
+socket.on('chat', (data) => {
+  var text = JSON.parse(data);
+  Message(text.id, text.val);
+})
+
 socket.on('disconnect', (id) => {
   for (var i = 0; i <index; i++) {
     if(game.otherPlayers[i].id === id) {
+      console.log('player disconnected');
       //game.otherPlayers[i].reset();
       //console.log(pool[i].init);
       game.otherPlayers.splice(i,1);
       game.otherPlayers.push(new Player());
+      index--;
     }
   }
 })
@@ -279,8 +291,9 @@ function Player() {
     this.color = 'undefined';
     this.name = 'not connected';
     this.connected = false;
-    this.colision = false;
     this.health = 100;
+    this.chat = false;
+    this.message = 'N/A';
 
     this.arrow = new Arrow();
 
@@ -323,10 +336,16 @@ function Player() {
         this.context.fillText(this.name, this.x - this.context.measureText(this.name).width / 2, this.y - this.r - this.r/6);
         //health  bar
         this.context.beginPath();
-        this.context.rect(this.x - 50, this.y + this.r + this.r/6, this.health, 10);
+        this.context.rect(this.x - 50, this.y + this.r + this.r/6, this.health*0,5, 5);
         this.context.fillStyle = 'green';
         this.context.fill();
         this.context.stroke();
+        //text chat
+        if(this.chat) {
+          this.context.font = "20px Comic Sans MS";
+          this.context.fillStyle = 'black';
+          this.context.fillText(this.message, this.x - this.context.measureText(this.name).width / 2, this.y - this.r*1.8);
+        }
     }
 }
 
@@ -387,9 +406,18 @@ function Arrow() {
         this.originY = y;
     };
 }
-
 //Arrow.prototype = new DrawableObj();
 Background.prototype = new DrawableObj();
+
+//double click
+function clearSelection() {
+    if(document.selection && document.selection.empty) {
+        document.selection.empty();
+    } else if(window.getSelection) {
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+    }
+}
 
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||

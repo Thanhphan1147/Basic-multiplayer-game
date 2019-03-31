@@ -181,6 +181,7 @@ function Tick() {
           pool[i].arrow.reset();
           if(pool[j].health === 10) {
             pool[j].health = 100;
+            pool[i].kills++;
           } else {
             pool[j].health -= 10;
           }
