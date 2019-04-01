@@ -72,16 +72,11 @@ function LineCollision(p1, p2, p3, p4) {
 
 initPlayers();
 //-----------------------//
-<<<<<<< HEAD
 
-=======
-/*
->>>>>>> a034cfcd53c09b7e392a85f2f19e08704f214d30
 app.use(express.static('public'));
 app.get('/', (req, res) => {
     res.sendFile(__dirname + "/index.html")
 })
-*/
 
 io.on('connection', (socket) => {
     console.log('new user connected');
