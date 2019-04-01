@@ -1,5 +1,8 @@
-socket = io.connect('http://localhost:8080');
+//socket = io.connect('http://localhost:8080');
 //socket = io.connect('http://192.168.1.18:8080');
+socket = io.connect('http://186.4.134.153:6969');
+//socket = io.connect('https://services.greencoaststudios.com:6969');
+
 var timer = 0;
 var size = 3;
 var index = 0;

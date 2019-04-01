@@ -72,6 +72,7 @@ function LineCollision(p1, p2, p3, p4) {
 
 initPlayers();
 //-----------------------//
+
 app.use(express.static('public'));
 app.get('/', (req, res) => {
     res.sendFile(__dirname + "/index.html")
